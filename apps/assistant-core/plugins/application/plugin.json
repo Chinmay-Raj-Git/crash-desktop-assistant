@@ -1,0 +1,7 @@
+{
+    "id": "application",
+    "name": "Application Plugin",
+    "version": "1.0.0",
+    "author": "CRASH-Owner",
+    "description": "Launches and manages desktop applications."
+}

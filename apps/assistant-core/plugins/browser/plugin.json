@@ -1,0 +1,7 @@
+{
+    "id": "browser",
+    "name": "Browser Plugin",
+    "version": "1.0.0",
+    "author": "CRASH-Owner",
+    "description": "Handles all browser and webpage capabilities."
+}

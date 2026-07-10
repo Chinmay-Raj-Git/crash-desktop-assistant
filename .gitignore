@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Environment
+.env
+
+# Logs
+logs/
+
+# VS Code
+.vscode/
+
+# Zip files
+*.zip
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (desktop-ui)
+node_modules/
+dist/

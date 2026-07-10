@@ -17,19 +17,14 @@ class Settings:
     """
 
     assistant_name: str = "CRASH"
-
     version: str = "0.1.0"
-
     log_directory: Path = Path("logs")
-
     plugins_directory: Path = Path("plugins")
-
     config_file: Path = Path("config/config.json")
-
     default_personality: str = (
         "Professional"
     )
-
     llm_provider: str = "mock"
-
     debug: bool = False
+    gemini_api_key: str = ""
+    gemini_model: str = "gemini-2.5-flash"

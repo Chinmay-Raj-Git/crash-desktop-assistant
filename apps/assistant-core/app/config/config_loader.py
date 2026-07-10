@@ -7,8 +7,10 @@ onto the Settings model.
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
+from dotenv import load_dotenv
+import os
+import json
 
 from app.config.settings import Settings
 
@@ -29,6 +31,18 @@ class ConfigLoader:
         Missing values fall back
         to defaults defined in Settings.
         """
+
+        load_dotenv()
+
+        self.settings.gemini_api_key = os.getenv(
+            "GEMINI_API_KEY",
+            self.settings.gemini_api_key,
+        )
+
+        self.settings.gemini_model = os.getenv(
+            "GEMINI_MODEL",
+            self.settings.gemini_model,
+        )
 
         config_path = self.settings.config_file
 

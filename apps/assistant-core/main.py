@@ -17,6 +17,7 @@ from app.core.response_engine import ResponseEngine
 from app.logging.logger_service import LoggerService
 
 from app.providers.mock_llm_provider import MockLLMProvider
+from app.providers.gemini_provider import GeminiProvider
 
 from app.services.capability_context_builder import CapabilityContextBuilder
 from app.services.intent_parser import IntentParser
@@ -70,7 +71,7 @@ def main() -> None:
     context_builder = CapabilityContextBuilder(plugin_registry=plugin_registry, resource_registry=resource_registry,)
     intent_parser = IntentParser(resource_registry=resource_registry,)
 
-    llm = MockLLMProvider(capability_context=context_builder.build(), parser=intent_parser,)
+    llm = GeminiProvider(api_key=settings.gemini_api_key, model=settings.gemini_model, capability_context=context_builder.build(),)
     response_engine = ResponseEngine(llm_provider=llm,)
 
     conversation_manager = ConversationManager()

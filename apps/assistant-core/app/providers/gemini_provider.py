@@ -17,6 +17,7 @@ from google import genai
 from app.interfaces.llm_provider import ILLMProvider
 
 from app.models.intent import Intent
+from app.models.llm_intent_schema import (INTENT_SCHEMA, INTENT_RULES, RESPONSE_MESSAGE_EXAMPLES, USAGE_EXAMPLES,)
 
 
 class GeminiProvider(ILLMProvider):
@@ -31,40 +32,32 @@ class GeminiProvider(ILLMProvider):
 
     def parse_intent(self, user_input: str,):
 
-        prompt = self._build_prompt(user_input,)
+        prompt = self._build_intent_prompt(user_input,)
         response = self._client.models.generate_content(model=self._model, contents=prompt,)
         
         text = ""
         if(response and response.text):
             text = response.text.strip()
-        data = json.loads(text)
+        
+        intent = Intent(plugin="", action="", target="", parameters={}, original_input=user_input,)
+        try:
+            data = json.loads(text)
+            intent = Intent(plugin=data["plugin"], action=data["action"], target=data.get("target"),
+                parameters=data.get("parameters",{},), original_input=user_input,
+            )
+            return (intent, data["response"],)
 
-        intent = Intent(plugin=data["plugin"], action=data["action"], target=data.get("target"),
-            parameters=data.get("parameters",{},), original_input=user_input,
-        )
+        except json.JSONDecodeError:
+            print(f"Failed to parse JSON from Gemini response: \n{text}")
+            return (intent, "Failed to parse Gemini response.",)
 
-        return (intent, data["response"],)
+
 
     # ---------------------------------------------------------
 
     def generate_failure_response(self, user_input, result, personality,):
 
-        prompt = f"""
-            The assistant failed.
-
-            User:
-            {user_input}
-
-            Failure:
-            {result.message}
-
-            Technical error:
-            {result.error}
-
-            Respond naturally as
-
-            {personality}
-            """
+        prompt = self._build_failure_prompt(user_input, result, personality,)
 
         response = self._client.models.generate_content(model=self._model, contents=prompt,)
 
@@ -72,40 +65,116 @@ class GeminiProvider(ILLMProvider):
 
     # ---------------------------------------------------------
 
-    def _build_prompt(self, user_input: str,) -> str:
+    def _build_intent_prompt(self, user_input: str,) -> str:
 
         return f"""
-            You are an intent parser for a desktop assistant.
+        -YOUR ROLE-
 
-            {self._capability_context}
+        You are the intent extraction engine for an AI-powered
+        Windows desktop assistant.
 
-            Rules
+        You are NOT the assistant that executes commands.
 
-            1. Return ONLY JSON.
+        Your responsibility is ONLY to:
 
-            2. Never wrap JSON in markdown.
+        1. Understand the user's request.
 
-            3. Never explain.
+        2. Convert it into structured JSON.
 
-            4. Use only available plugins.
+        3. Generate the short assistant response that should be
+        shown immediately IF execution succeeds.
 
-            5. Use only available actions.
+        You NEVER execute commands.
 
-            6. For browser URLs, return the COMPLETE URL.
+        You NEVER mention limitations like:
 
-            7. If the user asks to search, generate the full search URL.
+        "I can't access your computer."
 
-            8. Return this schema
+        "I cannot launch applications."
 
-            {{
-                "plugin":"",
-                "action":"",
-                "target":"",
-                "parameters":{{}},
-                "response":""
-            }}
+        "I don't have permission."
 
-            User request
+        The desktop assistant executes commands after receiving
+        your structured output.
+        
+        ...
+        
+        -AVAILABLE CAPABILITIES-
+        {self._capability_context}
 
-            {user_input}
+        ...
+
+        -JSON SCHEMA-
+        {INTENT_SCHEMA}
+
+        ...
+
+        -RULES-
+        {INTENT_RULES}
+
+        ...
+
+        -EXAMPLES-
+        {USAGE_EXAMPLES}
+        ----------
+        {RESPONSE_MESSAGE_EXAMPLES}
+
+        ...
+
+        -USER REQUEST-
+        {user_input}
+        
+        ...
+
+        """
+        
+    def _build_failure_prompt(self, user_input: str, result, personality: str,) -> str:
+
+        return f"""
+        -YOUR ROLE-
+
+        You are the failure response engine for an AI-powered
+        Windows desktop assistant.
+
+        You are NOT the assistant that executes commands.
+
+        Your responsibility is ONLY to:
+
+        1. Understand the user's request.
+
+        2. Understand the failure result.
+
+        3. Generate a natural language response that should be
+        shown immediately to the user.
+
+        You NEVER execute commands.
+
+        You NEVER mention limitations like:
+
+        "I can't access your computer."
+
+        "I cannot launch applications."
+
+        "I don't have permission."
+
+        The desktop assistant executes commands after receiving
+        your structured output.
+        
+        ...
+        
+        -USER REQUEST-
+        {user_input}
+
+        ...
+
+        -FAILURE RESULT-
+        {result.message}
+
+        ...
+
+        -TECHNICAL ERROR-
+        {result.error}
+
+        ...
+        
         """

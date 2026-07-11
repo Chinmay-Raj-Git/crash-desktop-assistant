@@ -38,7 +38,8 @@ class CapabilityContextBuilder:
             lines.append(f"- {plugin.metadata.id}")
 
             for capability in plugin.metadata.capabilities:
-                lines.append(f"    - {capability.action}")
+                lines.append(f" -{capability.action} - ")
+                lines.append(capability.description)
 
         lines.append("")
         lines.append("Known desktop applications:\n")

@@ -44,7 +44,7 @@ class AssistantEngine:
         self._logger.info(f"User: {user_input}")
 
         intent, initial_response = self._llm.parse_intent(user_input)
-        print("\nIntent Captured:", intent, "\nInitial Response:", initial_response, "\n")
+        # print("\nIntent Captured:", intent, "\nInitial Response:", initial_response, "\n")
 
                                                                                         #  --- HANDLES INVALID INTENTS --- (doesn't work for now)
                                                                                         # self._conversation_manager.set_last_intent(intent)

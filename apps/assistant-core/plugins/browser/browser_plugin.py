@@ -38,7 +38,6 @@ class BrowserPlugin(BasePlugin):
             path=Path(__file__).parent / "plugin.json",
             capabilities=(
                     Capability(plugin="browser", action="open_url", description="Open a URL in the default browser",),
-                    Capability(plugin="browser", action="search", description="Search using search engine",),
                 ),
         )
         
@@ -67,9 +66,6 @@ class BrowserPlugin(BasePlugin):
             case "open_url":
                 return self._open_url(intent)
             
-            case "search":
-                return self._search(intent)
-            
             case _:
                 return ActionResult(
                     status=ActionStatus.FAILED,
@@ -95,12 +91,4 @@ class BrowserPlugin(BasePlugin):
             data={
                 "url": url,
             },
-        )
-
-    # ---------------------------------------------------------
-    
-    def _search(self, intent: Intent, ) -> ActionResult:
-        return ActionResult(
-            status=ActionStatus.FAILED,
-            message="Search functionality not implemented yet.",
         )

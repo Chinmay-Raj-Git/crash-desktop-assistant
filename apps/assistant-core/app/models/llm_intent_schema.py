@@ -87,6 +87,34 @@ USAGE_EXAMPLES = """
 
             "response":"Searching YouTube for coding tutorials."
             }
+            -----
+            User - Create a folder named 'Resume' in Downloads
+
+            ↓
+            
+            {
+            "plugin": "filesystem",
+            "action": "create_folder",
+            "target": "Downloads",
+            "parameters": {
+                "name": "Resume"
+            },
+            "response": "Creating the Resume folder in Downloads."
+            }
+            -----
+            User - Create a file named 'notes.txt' on Desktop
+            
+            ↓
+            
+            {
+            "plugin": "filesystem",
+            "action": "create_file",
+            "target": "C:\\Users\\username\\Desktop",
+            "parameters": {
+                "name": "notes.txt"
+            },
+            "response": "Creating notes.txt on your Desktop."
+            }
         """
 
 RESPONSE_MESSAGE_EXAMPLES = """

@@ -1,0 +1,7 @@
+{
+    "id": "filesystem",
+    "name": "File System Plugin",
+    "version": "1.0.0",
+    "author": "CRASH-Owner",
+    "description": "Handles all OS level file system operations."
+}

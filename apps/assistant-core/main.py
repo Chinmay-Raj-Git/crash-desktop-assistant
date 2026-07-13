@@ -22,10 +22,12 @@ from app.providers.gemini_provider import GeminiProvider
 from app.services.capability_context_builder import CapabilityContextBuilder
 from app.services.intent_parser import IntentParser
 from app.services.process_service import ProcessService
+from app.services.filesystem_service import FileSystemService
 from app.services.resource_registry import ResourceRegistry
 
 from plugins.application.application_plugin import ApplicationPlugin
 from plugins.browser.browser_plugin import BrowserPlugin
+from plugins.filesystem.filesystem_plugin import FileSystemPlugin
 
 
 def main() -> None:
@@ -55,9 +57,11 @@ def main() -> None:
     # ---------------------------------------------------------
 
     process_service = ProcessService()
+    filesystem_service = FileSystemService()
 
     plugin_manager.load_plugin(ApplicationPlugin(registry=resource_registry, process_service=process_service,))
-    plugin_manager.load_plugin(BrowserPlugin(registry=resource_registry, process_service=process_service,))
+    plugin_manager.load_plugin(BrowserPlugin())
+    plugin_manager.load_plugin(FileSystemPlugin(filesystem=filesystem_service,))
 
     logger.info("Registered plugins", count=len(plugin_registry.plugins),)
     logger.info("Registered capabilities", capabilities=list(plugin_registry.capabilities),)

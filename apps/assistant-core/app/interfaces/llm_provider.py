@@ -47,7 +47,7 @@ class ILLMProvider(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def generate_failure_response(self, user_input: str, result: ActionResult, personality: str,) -> str | None:
+    def generate_failure_response(self, user_input: str, result: ActionResult, personality: str,) -> str | None :
         """
         Generates a conversational response after a failed
         or partially successful task.

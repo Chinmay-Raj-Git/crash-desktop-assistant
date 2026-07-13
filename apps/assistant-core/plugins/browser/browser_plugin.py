@@ -31,7 +31,7 @@ from plugins.base_plugin import BasePlugin
 
 class BrowserPlugin(BasePlugin):
 
-    def __init__(self, registry: ResourceRegistry, process_service: ProcessService,) -> None:
+    def __init__(self,) -> None:
 
         
         self._metadata = self._load_metadata(
@@ -42,9 +42,6 @@ class BrowserPlugin(BasePlugin):
         )
         
         super().__init__(metadata=self._metadata)
-
-        self._registry = registry
-        self._process_service = process_service
 
     @property
     def metadata(self) -> PluginMetadata:

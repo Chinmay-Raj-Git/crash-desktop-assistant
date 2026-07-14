@@ -115,6 +115,27 @@ USAGE_EXAMPLES = """
             },
             "response": "Creating notes.txt on your Desktop."
             }
+            -----
+            User - "Could you turn the volume down a bit?"
+
+            ↓
+
+            plugin="system"
+
+            action="volume"
+
+            parameters={
+                "direction":"down",
+                "amount":20
+            }
+            -----
+            User - "I'm done for today, lock my computer."
+
+            ↓
+
+            plugin="system"
+
+            action="lock"
         """
 
 RESPONSE_MESSAGE_EXAMPLES = """

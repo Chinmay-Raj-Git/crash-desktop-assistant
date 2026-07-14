@@ -1,0 +1,7 @@
+{
+    "id": "system",
+    "name": "System Plugin",
+    "version": "1.0.0",
+    "author": "CRASH-Owner",
+    "description": "Controls operating system level functionality."
+}

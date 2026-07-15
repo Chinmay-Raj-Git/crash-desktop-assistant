@@ -22,6 +22,7 @@ class ActionStatus(Enum):
     SUCCESS = "success"
     FAILED = "failed"
     PARTIAL = "partial"
+    UNCONFIRMED = "unconfirmed"
 
 
 @dataclass(slots=True)

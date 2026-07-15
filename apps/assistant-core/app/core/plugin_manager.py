@@ -18,6 +18,11 @@ from app.core.plugin_registry import PluginRegistry
 from app.interfaces.logger import ILogger
 from app.interfaces.plugin import IPlugin
 
+from plugins.application.application_plugin import ApplicationPlugin
+from plugins.browser.browser_plugin import BrowserPlugin
+from plugins.filesystem.filesystem_plugin import FileSystemPlugin
+from plugins.system.system_plugin import SystemPlugin
+
 
 class PluginManager:
     """
@@ -57,6 +62,16 @@ class PluginManager:
             "Plugin loaded",
             plugin=plugin.metadata.name,
         )
+        
+    def load_all(self, *, resource_registry, process_service, filesystem_service, system_service) -> None:
+        
+        self.load_plugin(ApplicationPlugin(registry=resource_registry, process_service=process_service))
+
+        self.load_plugin(BrowserPlugin())
+
+        self.load_plugin(SystemPlugin(system=system_service))
+
+        self.load_plugin(FileSystemPlugin(filesystem=filesystem_service))
 
     def shutdown(self) -> None:
         """

@@ -53,19 +53,17 @@ def main() -> None:
     )
 
     resource_registry = ResourceRegistry()
-
-    # ---------------------------------------------------------
-    # Plugin registration
-    # ---------------------------------------------------------
-
     process_service = ProcessService()
     filesystem_service = FileSystemService()
     system_service = SystemService()
 
-    plugin_manager.load_plugin(ApplicationPlugin(registry=resource_registry, process_service=process_service,))
-    plugin_manager.load_plugin(BrowserPlugin())
-    plugin_manager.load_plugin(SystemPlugin(system_service))
-    plugin_manager.load_plugin(FileSystemPlugin(filesystem=filesystem_service,))
+    # ---------------------------------------------------------
+    # Plugin registration
+    # ---------------------------------------------------------
+    
+    plugin_manager.load_all(resource_registry=resource_registry, process_service=process_service,
+        filesystem_service=filesystem_service, system_service=system_service,
+    )
 
     logger.info("Registered plugins", count=len(plugin_registry.plugins),)
     logger.info("Registered capabilities", capabilities=list(plugin_registry.capabilities),)
@@ -81,6 +79,7 @@ def main() -> None:
 
     # llm = MockLLMProvider(capability_context=context_builder.build(), intent_parser=intent_parser,)
     # intent_parser = IntentParser(resource_registry=resource_registry,)
+    
     response_engine = ResponseEngine(llm_provider=llm,)
 
     conversation_manager = ConversationManager()

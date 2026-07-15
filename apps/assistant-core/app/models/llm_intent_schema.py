@@ -75,6 +75,19 @@ USAGE_EXAMPLES = """
             "response":"Opening Brave Browser."
             }
             -----
+            User - Close VS Code
+
+            ↓
+
+            {
+            "plugin":"application",
+            "action":"close",
+            "target":"Visual Studio Code",
+            "confirmation_message":"Are you sure you want to close Visual Studio Code? Any unsaved work will be lost.",
+
+            "response":"Closing Visual Studio Code."
+            }
+            -----
             User - Search YouTube for coding tutorials
 
             ↓

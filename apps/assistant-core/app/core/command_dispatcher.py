@@ -18,13 +18,22 @@ class CommandDispatcher:
         
         self._registry = registry
 
-    def dispatch(self, intent: Intent, ) -> ActionResult:
+    def dispatch(self, intent: Intent, *, skip_confirmation: bool = False,) -> ActionResult:
 
         if not self._registry.has_capability(intent.capability):
 
             return ActionResult(
                 status=ActionStatus.FAILED,
                 message="Unknown capability.",
+                error=intent.capability,
+            )
+            
+        intent.requires_confirmation = self._registry.get_capability(intent.capability).requires_confirmation
+            
+        if intent.requires_confirmation and not skip_confirmation:
+            return ActionResult(
+                status=ActionStatus.UNCONFIRMED,
+                message=intent.confirmation_message or "Are you sure you want to proceed?",
                 error=intent.capability,
             )
 

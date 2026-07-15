@@ -35,7 +35,7 @@ class ApplicationPlugin(BasePlugin):
             path=Path(__file__).parent / "plugin.json",
             capabilities=(
                     Capability(plugin="application", action="launch", description="Launch an application",),
-                    Capability(plugin="application", action="close", description="Close an application",),
+                    Capability(plugin="application", action="close", description="Close an application", requires_confirmation=True,),
                     Capability(plugin="application", action="running", description="Check if an application is running",),
                 ),
         )

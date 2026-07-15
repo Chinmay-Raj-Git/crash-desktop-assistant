@@ -20,12 +20,11 @@ class ConversationManager:
     @property
     def state(self) -> ConversationState:
         return self._state
-
-    def begin(self, intent: Intent, prompt: str,) -> None:
-
+        
+    def store_pending(self, intent: Intent, question: str,) -> None:
         self._state.active = True
         self._state.pending_intent = intent
-        self._state.prompt = prompt
+        self._state.question = question
 
     def complete(self) -> None:
         self._state.clear()

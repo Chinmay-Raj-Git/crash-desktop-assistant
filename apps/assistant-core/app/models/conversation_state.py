@@ -22,7 +22,7 @@ class ConversationState:
     pending_intent: Intent | None = None
 
     # Question currently asked to the user
-    prompt: str = ""
+    question: str = ""
 
     def clear(self) -> None:
         """
@@ -30,4 +30,4 @@ class ConversationState:
         """
         self.active = False
         self.pending_intent = None
-        self.prompt = ""
+        self.question = ""

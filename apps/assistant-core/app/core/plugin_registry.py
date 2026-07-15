@@ -13,6 +13,7 @@ should execute an incoming intent.
 """
 
 from app.interfaces.plugin import IPlugin
+from app.models.capability import Capability
 
 
 class PluginRegistry:
@@ -22,7 +23,7 @@ class PluginRegistry:
 
     def __init__(self) -> None:
         self._plugins: dict[str, IPlugin] = {}
-        self._capabilities: dict[str, IPlugin] = {}
+        self._capabilities: dict[str, Capability] = {}
 
     def register(self, plugin: IPlugin) -> None:
         """
@@ -46,7 +47,7 @@ class PluginRegistry:
                     "already registered."
                 )
 
-            self._capabilities[capability.id] = plugin
+            self._capabilities[capability.id] = capability
 
     def get_plugin(self, plugin_id: str) -> IPlugin:
         """
@@ -61,13 +62,22 @@ class PluginRegistry:
         """
         Returns the plugin responsible for a capability.
         """
-        return self._capabilities[capability_id]
+        return self._plugins[self._capabilities[capability_id].plugin]
 
     def has_capability(self, capability_id: str) -> bool:
         """
         Checks if a capability exists.
         """
         return capability_id in self._capabilities
+    
+    def get_capability(self, capability_id: str) -> Capability:
+        """
+        Returns a capability by ID.
+        """
+        if self.has_capability(capability_id) is False:
+            raise ValueError(f"Capability '{capability_id}' not found.")
+        
+        return self._capabilities[capability_id]
 
     @property
     def plugins(self) -> tuple[IPlugin, ...]:

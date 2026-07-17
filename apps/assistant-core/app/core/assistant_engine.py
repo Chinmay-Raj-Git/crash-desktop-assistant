@@ -47,7 +47,7 @@ class AssistantEngine:
         intent = Intent(plugin="", action="")
         assistant_message = ""
         
-        # Check if there's an active conversation awaiting user confirmation
+        # CONDITON TO CHECK: Active convo present or not
         if self._conversation_manager.active:
             pending_intent = self._conversation_manager.state.pending_intent
             
@@ -58,7 +58,7 @@ class AssistantEngine:
                     intent=Intent(plugin="", action=""), action_result=ActionResult(status=ActionStatus.FAILED, message="No pending intent found.", error="No pending intent",),
                 )
                 
-            # Process the user's response to the confirmation question
+            # SUB-CONDITION TO CHECK: Agree?
             if user_input.lower() in ["yes", "y"]:
                 # User confirmed the action
                 self._logger.info(f"User confirmed the action for intent: {pending_intent}")
@@ -67,6 +67,7 @@ class AssistantEngine:
                 
                 self._conversation_manager.complete()                
             
+            # SUB-CONDITION TO CHECK: Disagree?
             elif user_input.lower() in ["no", "n"]:
                 # User denied the action
                 self._logger.info(f"User denied the action for intent: {pending_intent}")
@@ -79,14 +80,14 @@ class AssistantEngine:
                 )
                 
             else:
-                # User provided an invalid response
+                # INVALID CASE
                 self._logger.warning(f"Invalid response to confirmation question: {user_input}")
                 return AssistantResponse(
                     user_input=user_input, assistant_message="Error: Invalid response.",
                     intent=Intent(plugin="", action=""), action_result=ActionResult(status=ActionStatus.FAILED, message="Invalid response.", error="Invalid response",),
                 )
                 
-        # No active convos, parse normally
+        # CONDITON CHECK FALSE: No active convos, parse normally
         else:                   
             intent, initial_response = self._llm.parse_intent(user_input)
             

@@ -13,36 +13,23 @@ Examples:
 from abc import ABC, abstractmethod
 
 from app.models.action_result import ActionResult
-from app.models.intent import Intent
+from app.models.execution_plan import ExecutionPlan
 
 
 class ILLMProvider(ABC):
     """
-    Contract implemented by every AI provider.
+    Produces structured execution plans from natural language.
+
+    Implementations are responsible only for planning.
+
+    They never execute actions.
     """
 
     @abstractmethod
-    def parse_intent(
-        self,
-        user_input: str,
-    ) -> tuple[Intent, str]:
+    def parse_execution_plan(self, user_input: str,) -> ExecutionPlan:
         """
-        Converts a natural language request into:
-
-        1. Structured Intent
-        2. Initial assistant response
-
-        Example
-
-        User:
-            "Open Brave"
-
-        Returns:
-
-        (
-            Intent(...),
-            "Opening Brave for you."
-        )
+        Convert a natural-language request into an
+        ordered ExecutionPlan.
         """
         raise NotImplementedError
 

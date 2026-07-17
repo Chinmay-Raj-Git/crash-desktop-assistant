@@ -17,7 +17,9 @@ from google import genai
 from app.interfaces.llm_provider import ILLMProvider
 
 from app.models.intent import Intent
-from app.models.llm_intent_schema import (INTENT_SCHEMA, INTENT_RULES, RESPONSE_MESSAGE_EXAMPLES, USAGE_EXAMPLES,)
+from app.models.planned_task import PlannedTask
+from app.models.execution_plan import ExecutionPlan
+from app.models.llm_intent_schema import (SYSTEM_ROLE, EXECUTION_PLAN_SCHEMA, RULES, PLANNING_RULES, RESPONSE_RULES, EXAMPLES)
 
 
 class GeminiProvider(ILLMProvider):
@@ -30,7 +32,7 @@ class GeminiProvider(ILLMProvider):
 
     # ---------------------------------------------------------
 
-    def parse_intent(self, user_input: str,):
+    def parse_execution_plan(self, user_input: str,):
 
         prompt = self._build_intent_prompt(user_input,)
         response = self._client.models.generate_content(model=self._model, contents=prompt,)
@@ -42,14 +44,36 @@ class GeminiProvider(ILLMProvider):
         intent = Intent(plugin="", action="", target="", parameters={}, original_input=user_input,)
         try:
             data = json.loads(text)
-            intent = Intent(plugin=data["plugin"], action=data["action"], target=data.get("target"),
-                parameters=data.get("parameters",{},), original_input=user_input,
-            )
-            return (intent, data["response"],)
+            tasks = []
+            
+            for task_data in data["tasks"]:
+                intent_data = task_data["intent"]
+
+                intent = Intent(
+                    plugin=intent_data["plugin"],
+                    action=intent_data["action"],
+                    target=intent_data["target"],
+                    parameters=intent_data.get("parameters", {}),
+                    original_input=intent_data.get(
+                        "original_input",
+                        user_input,
+                    ),
+                )
+
+                tasks.append(
+                    PlannedTask(
+                        task_id=task_data["task_id"],
+                        intent=intent,
+                        response=task_data["response"],
+                    )
+                )
+                
+                
+            return ExecutionPlan(summary_response=data["summary_response"], tasks=tuple(tasks),)
 
         except json.JSONDecodeError:
             print(f"Failed to parse JSON from Gemini response: \n{text}")
-            return (intent, "Failed to parse Gemini response.",)
+            raise RuntimeError("Gemini returned invalid ExecutionPlan JSON.")
 
 
 
@@ -104,20 +128,27 @@ class GeminiProvider(ILLMProvider):
 
         ...
 
-        -JSON SCHEMA-
-        {INTENT_SCHEMA}
+        {SYSTEM_ROLE}
+        
+        ...
+        
+        {EXECUTION_PLAN_SCHEMA}
 
         ...
-
-        -RULES-
-        {INTENT_RULES}
-
+        
+        {RULES}
+        
         ...
-
-        -EXAMPLES-
-        {USAGE_EXAMPLES}
-        ----------
-        {RESPONSE_MESSAGE_EXAMPLES}
+        
+        {PLANNING_RULES}
+        
+        ...
+        
+        {RESPONSE_RULES}
+        
+        ...
+        
+        {EXAMPLES}
 
         ...
 

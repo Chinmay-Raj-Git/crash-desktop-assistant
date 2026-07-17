@@ -43,72 +43,42 @@ class AssistantEngine:
         self._logger = logger
 
     def process(self, user_input: str) -> AssistantResponse:
-        self._logger.info(f"User: {user_input}")
-        intent = Intent(plugin="", action="")
-        assistant_message = ""
         
-        # CONDITON TO CHECK: Active convo present or not
-        if self._conversation_manager.active:
-            pending_intent = self._conversation_manager.state.pending_intent
-            
-            if pending_intent is None:
-                self._logger.error("No pending intent found in conversation state.")
-                return AssistantResponse(
-                    user_input=user_input, assistant_message="Error: No pending intent found.",
-                    intent=Intent(plugin="", action=""), action_result=ActionResult(status=ActionStatus.FAILED, message="No pending intent found.", error="No pending intent",),
-                )
-                
-            # SUB-CONDITION TO CHECK: Agree?
-            if user_input.lower() in ["yes", "y"]:
-                # User confirmed the action
-                self._logger.info(f"User confirmed the action for intent: {pending_intent}")
-                action_result = self._dispatcher.dispatch(pending_intent, skip_confirmation=True,)
-                assistant_message = "Action executed upon confirmation."
-                
-                self._conversation_manager.complete()                
-            
-            # SUB-CONDITION TO CHECK: Disagree?
-            elif user_input.lower() in ["no", "n"]:
-                # User denied the action
-                self._logger.info(f"User denied the action for intent: {pending_intent}")
-                
-                self._conversation_manager.complete()
-                
-                return AssistantResponse(
-                    user_input=user_input, assistant_message="Action cancelled.",
-                    intent=pending_intent, action_result=ActionResult(status=ActionStatus.FAILED, message="Action cancelled.", error="User denied the action",),
-                )
-                
-            else:
-                # INVALID CASE
-                self._logger.warning(f"Invalid response to confirmation question: {user_input}")
-                return AssistantResponse(
-                    user_input=user_input, assistant_message="Error: Invalid response.",
-                    intent=Intent(plugin="", action=""), action_result=ActionResult(status=ActionStatus.FAILED, message="Invalid response.", error="Invalid response",),
-                )
-                
-        # CONDITON CHECK FALSE: No active convos, parse normally
-        else:                   
-            intent, initial_response = self._llm.parse_intent(user_input)
-            
-            action_result = self._dispatcher.dispatch(intent)            
-            assistant_message = initial_response
-            
-            if(action_result.status == ActionStatus.UNCONFIRMED):
-                assistant_message = action_result.message
-                self._conversation_manager.store_pending(intent, assistant_message)
-            
-            
-        if action_result.status == ActionStatus.FAILED:
-            assistant_message = self._llm.generate_failure_response(user_input=user_input, result=action_result,
-                personality="Professional"  # TODO: Make this dynamic based on user settings
-            )
+        self._logger.info(f"User: {user_input}")
+        # TODO:
+        # Re-enable once ExecutionPlan-based confirmation
+        # workflow is implemented.
 
-        self._logger.info(
-            f"Execution finished: {action_result.status.value}"
-        )
+        # if self._conversation_manager.active:
+        #     return self._continue_conversation(user_input)
 
-        return AssistantResponse(
-            user_input=user_input, assistant_message=assistant_message or "Response Failed!",
-            intent=intent, action_result=action_result,
+        return self._execute_plan(user_input)
+    
+    def _execute_plan(self, user_input: str) -> AssistantResponse:
+        
+        plan = self._llm.parse_execution_plan(user_input)
+        print("================================================================================================")
+        print("================-----------------------------------------------------------------==============")
+        print(plan)
+        print("================-----------------------------------------------------------------==============")
+        print("================================================================================================")
+        last_result = ActionResult(
+            status=ActionStatus.SUCCESS,
+            message="DEFAULT",
+            data={},
         )
+        
+        assistant_message = plan.summary_response
+
+        for task in plan.tasks:
+
+            last_result = self._dispatcher.dispatch(task.intent)
+            print("==> "+last_result.message)
+
+            if last_result.status == ActionStatus.FAILED:
+                break
+            if last_result.status == ActionStatus.UNCONFIRMED:
+                break
+            
+            
+        return AssistantResponse(user_input=user_input, assistant_message=assistant_message, intent=Intent(plugin="", action=""), action_result=last_result)

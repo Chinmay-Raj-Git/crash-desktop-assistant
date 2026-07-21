@@ -32,6 +32,9 @@ class Capability:
 
     # Human-readable description
     description: str
+    
+    # Question asked to confirm task execution
+    confirmation_message: str = ""
 
     # Whether this action requires confirmation
     requires_confirmation: bool = False

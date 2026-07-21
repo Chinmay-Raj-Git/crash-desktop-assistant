@@ -29,21 +29,29 @@ class SystemPlugin(BasePlugin):
                     plugin="system",
                     action="lock",
                     description="Lock the computer",
+                    confirmation_message = "Woah there dude! watch out, imma lock your pc fr...",
+                    requires_confirmation = True
                 ),
                 Capability(
                     plugin="system",
                     action="sleep",
                     description="Put the computer to sleep",
+                    confirmation_message = "Woah there dude! watch out, imma sleep your pc fr...",
+                    requires_confirmation = True
                 ),
                 Capability(
                     plugin="system",
                     action="shutdown",
                     description="Shutdown the computer",
+                    confirmation_message = "Woah there dude! watch out, imma shut your pc fr...",
+                    requires_confirmation = True
                 ),
                 Capability(
                     plugin="system",
                     action="restart",
                     description="Restart the computer",
+                    confirmation_message = "Woah there dude! watch out, imma restart your pc fr...",
+                    requires_confirmation = True
                 ),
             ),
         )

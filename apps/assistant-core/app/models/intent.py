@@ -60,15 +60,6 @@ class Intent:
     # Optional arguments
     parameters: dict[str, Any] = field(default_factory=dict)
 
-    # Whether user confirmation is required
-    requires_confirmation: bool = False
-    
-    # Asks for confirmation in terms of action's context
-    confirmation_message: str | None = None
-
-    # AI confidence score (0.0 - 1.0)
-    confidence: float = 1.0
-
     # Current execution status
     status: IntentStatus = IntentStatus.PENDING
 
@@ -102,8 +93,6 @@ class Intent:
             f"plugin='{self.plugin}', "
             f"action='{self.action}', "
             f"target='{self.target}', "
-            f"requires_confirmation={self.requires_confirmation}, "
-            f"confidence={self.confidence:.2f}, "
             f"parameters={self.parameters}, "
             f"status='{self.status.value}')"
         )

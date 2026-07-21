@@ -28,12 +28,12 @@ class CommandDispatcher:
                 error=intent.capability,
             )
             
-        intent.requires_confirmation = self._registry.get_capability(intent.capability).requires_confirmation
+        capability = self._registry.get_capability(intent.capability)
             
-        if intent.requires_confirmation and not skip_confirmation:
+        if capability.requires_confirmation and not skip_confirmation:
             return ActionResult(
                 status=ActionStatus.UNCONFIRMED,
-                message=intent.confirmation_message or "Are you sure you want to proceed?",
+                message=capability.confirmation_message or "Are you sure you want to proceed?",
                 error=intent.capability,
             )
 
